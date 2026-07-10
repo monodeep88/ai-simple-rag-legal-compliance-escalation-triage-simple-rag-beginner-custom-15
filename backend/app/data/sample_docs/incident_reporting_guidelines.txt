@@ -1,0 +1,6 @@
+Serious Compliance Incident Reporting Guidelines:
+1.  **Immediate Notification (within 24 hours):** Any incident that could lead to significant legal exposure, financial loss, or reputational damage must be reported to the Head of Compliance and Legal Department immediately (within 24 business hours).
+2.  **Documentation:** Complete an 'Incident Report Form' detailing the nature of the incident, individuals involved, date, time, and any initial actions taken.
+3.  **Severity Assessment:** The Compliance Department will assess the severity (Low, Medium, High) and potential impact.
+4.  **Escalation Matrix:** High severity incidents are automatically escalated to the Executive Leadership Team. Medium incidents require a remediation plan within 7 days. Low incidents are resolved by the local management with oversight.
+5.  **Data Breaches:** Suspected data breaches involving personal identifiable information (PII) must also be reported to the IT Security Team immediately.
