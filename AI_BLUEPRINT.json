@@ -1,0 +1,256 @@
+{
+  "mode": "ai",
+  "project_title": "Legal Compliance Escalation Triage RAG Assistant",
+  "short_description": "A beginner-friendly RAG system to help compliance officers quickly triage legal compliance escalation inquiries based on internal policy documents.",
+  "domain_summary": "The legal compliance domain involves adhering to laws, regulations, and internal policies. Escalation triage specifically focuses on the initial assessment of reported compliance issues, determining their severity, responsible department, and next steps. This project simplifies this process by providing quick access to relevant policy information.",
+  "user_persona": "Junior Compliance Officer (JCO): A JCO is responsible for the initial review of reported compliance issues, policy inquiries, or potential violations. They need quick, accurate access to internal guidelines to categorize incidents, identify responsible parties, and understand escalation protocols. Their primary goal is efficient, consistent, and compliant triage.",
+  "architecture_notes": [
+    "For a beginner project, we'll prioritize simplicity and local execution where possible. We'll use open-source embedding models (e.g., `sentence-transformers`) and an in-memory or file-based vector database (e.g., `ChromaDB` or `FAISS` running locally) to reduce setup complexity. The LLM can be accessed via a free tier/developer key (e.g., OpenAI, Google Gemini) or a local small LLM (e.g., a quantized Llama-2 variant) if computational resources allow. Docker will containerize the backend and frontend for easy deployment. The focus is on understanding the core RAG pipeline, not on production-scale infrastructure."
+  ],
+  "backend_modules": [
+    "{'api_service': 'FastAPI application defining REST endpoints for health checks, document upload (for future expansion), and the core RAG query.', 'rag_core': 'Python module containing the RAG orchestration logic: query embedding, vector database interaction, context retrieval, and LLM prompting.', 'document_processor': \"Module for loading, chunking (e.g., using Langchain's TextSplitter), and embedding documents into the vector store.\", 'embedding_service': \"Wrapper around a chosen embedding model (e.g., HuggingFace's `sentence-transformers`).\", 'vector_store_manager': 'Interface for interacting with the chosen vector database (e.g., `ChromaDB` client).'}"
+  ],
+  "frontend_features": [
+    "{'search_input': 'Text input field for users to type their compliance-related questions.', 'response_display': 'Area to display the AI-generated answer.', 'loading_indicator': 'Visual feedback while the AI is processing the query.', 'source_document_links': 'Display links or references to the original document chunks used by the LLM (optional, but good for trust).', 'basic_styling': 'Clean, simple UI design for readability and ease of use.'}"
+  ],
+  "data_sources": [
+    "{'primary': 'Internal company compliance policy documents (PDF, DOCX, TXT files).', 'initial_corpus': \"A small set of sample policy documents relevant to common compliance escalation scenarios (e.g., 'Whistleblower Policy Summary', 'Incident Reporting Guidelines', 'Ethical Conduct Policy').\"}"
+  ],
+  "testing_strategy": [
+    "{'unit_tests': 'Test individual components: chunking logic, embedding function, vector store retrieval, prompt construction.', 'integration_tests': 'Test the full RAG pipeline with known queries and expected answers against the sample document corpus. Verify that relevant documents are retrieved and LLM generates plausible answers.', 'rag_evaluation': 'Manual evaluation for relevance of retrieved chunks and faithfulness/accuracy of LLM generated responses. Test edge cases (e.g., out-of-scope questions, ambiguous queries).', 'frontend_tests': 'Basic UI tests for component rendering and user interaction (e.g., input field, button click).'}"
+  ],
+  "starter_questions": [
+    "What is the process for reporting a potential ethics violation?",
+    "Who should I contact for an HR compliance issue?",
+    "What steps are required for a data privacy breach escalation?",
+    "Where can I find the company's anti-bribery policy?",
+    "How quickly must a serious compliance incident be reported?"
+  ],
+  "workflow_steps": [
+    "**Step 1: Document Ingestion (Offline/Setup)**: Sample compliance documents are loaded, chunked into smaller passages, and converted into numerical embeddings.",
+    "**Step 2: Vector Database Population (Offline/Setup)**: These embeddings are stored in the vector database, indexed for efficient semantic search.",
+    "**Step 3: User Query (Online)**: A Junior Compliance Officer enters a question into the frontend (e.g., 'How do I report a conflict of interest?').",
+    "**Step 4: Query Embedding (Backend)**: The backend API receives the query and converts it into a vector embedding using the same embedding model.",
+    "**Step 5: Semantic Search (Backend + Vector DB)**: The query embedding is used to search the vector database for the most semantically similar document chunks.",
+    "**Step 6: Context Retrieval (Backend)**: The top N (e.g., 3-5) most relevant document chunks are retrieved.",
+    "**Step 7: Prompt Construction (Backend)**: These retrieved chunks are combined with the original user query and a system instruction into a concise prompt for the LLM.",
+    "**Step 8: LLM Generation (Backend)**: The prompt is sent to the LLM, which generates a coherent and relevant answer based *only* on the provided context."
+  ],
+  "business_rules": [
+    "**Relevance First**: Answers must primarily rely on information retrieved from the provided compliance documents.",
+    "**Conciseness**: Responses should be direct and to the point, avoiding unnecessary jargon.",
+    "**Clarity**: Language used in responses should be easy for a JCO to understand.",
+    "**Non-Discretionary**: The system should not offer legal advice or make subjective judgments; it only provides information based on policies.",
+    "**Source Transparency (Recommended)**: If possible, indicate which document(s) or policy sections were used to formulate the answer.",
+    "**Scope Limitation**: The system should acknowledge if a query is outside the scope of its knowledge base (i.e., no relevant documents found)."
+  ],
+  "sample_documents": [
+    {
+      "filename": "whistleblower_policy_summary.txt",
+      "content": "Our Whistleblower Policy encourages employees to report concerns about unethical or illegal conduct without fear of retaliation. All reports are treated confidentially to the extent possible. To report a concern, contact the Ethics Hotline at 1-800-555-ETCS or submit an online form through the internal portal. Reports can include financial misconduct, harassment, discrimination, or violations of company policy. Anonymous reports are permitted. All reports will be investigated promptly by the Compliance Department."
+    },
+    {
+      "filename": "incident_reporting_guidelines.txt",
+      "content": "Serious Compliance Incident Reporting Guidelines:\n1.  **Immediate Notification (within 24 hours):** Any incident that could lead to significant legal exposure, financial loss, or reputational damage must be reported to the Head of Compliance and Legal Department immediately (within 24 business hours).\n2.  **Documentation:** Complete an 'Incident Report Form' detailing the nature of the incident, individuals involved, date, time, and any initial actions taken.\n3.  **Severity Assessment:** The Compliance Department will assess the severity (Low, Medium, High) and potential impact.\n4.  **Escalation Matrix:** High severity incidents are automatically escalated to the Executive Leadership Team. Medium incidents require a remediation plan within 7 days. Low incidents are resolved by the local management with oversight.\n5.  **Data Breaches:** Suspected data breaches involving personal identifiable information (PII) must also be reported to the IT Security Team immediately."
+    },
+    {
+      "filename": "ethical_conduct_policy.txt",
+      "content": "This Ethical Conduct Policy outlines the standards of behavior expected from all employees, contractors, and partners. Key principles include integrity, respect, fairness, and accountability. Employees must avoid conflicts of interest, bribery, and corruption. Gifts of nominal value are permitted, but anything exceeding $50 requires manager approval. Any situations that appear to be a conflict of interest must be disclosed to your manager and the HR department. Failure to adhere to this policy may result in disciplinary action, up to and including termination."
+    }
+  ],
+  "tool_catalog": [
+    {
+      "name": "DocumentSearch",
+      "description": "Searches the internal policy document knowledge base for relevant information given a query."
+    },
+    {
+      "name": "CompliancePolicyLookup",
+      "description": "Specifically designed to retrieve details about company policies related to ethics, reporting, or specific regulatory areas."
+    }
+  ],
+  "agent_plan": [
+    {
+      "name": "Architecture Agent",
+      "role": "Define app boundaries, data flow, runtime stack, and integration points.",
+      "outputs": [
+        "For a beginner project, we'll prioritize simplicity and local execution where possible. We'll use open-source embedding models (e.g., `sentence-transformers`) and an in-memory or file-based vector database (e.g., `ChromaDB` or `FAISS` running locally) to reduce setup complexity. The LLM can be accessed via a free tier/developer key (e.g., OpenAI, Google Gemini) or a local small LLM (e.g., a quantized Llama-2 variant) if computational resources allow. Docker will containerize the backend and frontend for easy deployment. The focus is on understanding the core RAG pipeline, not on production-scale infrastructure."
+      ]
+    },
+    {
+      "name": "Backend Agent",
+      "role": "Design FastAPI modules, service contracts, validation, and error handling.",
+      "outputs": [
+        "{'api_service': 'FastAPI application defining REST endpoints for health checks, document upload (for future expansion), and the core RAG query.', 'rag_core': 'Python module containing the RAG orchestration logic: query embedding, vector database interaction, context retrieval, and LLM prompting.', 'document_processor': \"Module for loading, chunking (e.g., using Langchain's TextSplitter), and embedding documents into the vector store.\", 'embedding_service': \"Wrapper around a chosen embedding model (e.g., HuggingFace's `sentence-transformers`).\", 'vector_store_manager': 'Interface for interacting with the chosen vector database (e.g., `ChromaDB` client).'}"
+      ]
+    },
+    {
+      "name": "Frontend Agent",
+      "role": "Design React screens, state flow, controls, and user feedback states.",
+      "outputs": [
+        "{'search_input': 'Text input field for users to type their compliance-related questions.', 'response_display': 'Area to display the AI-generated answer.', 'loading_indicator': 'Visual feedback while the AI is processing the query.', 'source_document_links': 'Display links or references to the original document chunks used by the LLM (optional, but good for trust).', 'basic_styling': 'Clean, simple UI design for readability and ease of use.'}"
+      ]
+    },
+    {
+      "name": "Database Agent",
+      "role": "Design persistence models, sample data, indexes, and audit records.",
+      "outputs": [
+        "Run history",
+        "Source document metadata",
+        "Generated workflow audit records"
+      ]
+    },
+    {
+      "name": "Testing Agent",
+      "role": "Define contract tests, smoke tests, and generated project validation.",
+      "outputs": [
+        "{'unit_tests': 'Test individual components: chunking logic, embedding function, vector store retrieval, prompt construction.', 'integration_tests': 'Test the full RAG pipeline with known queries and expected answers against the sample document corpus. Verify that relevant documents are retrieved and LLM generates plausible answers.', 'rag_evaluation': 'Manual evaluation for relevance of retrieved chunks and faithfulness/accuracy of LLM generated responses. Test edge cases (e.g., out-of-scope questions, ambiguous queries).', 'frontend_tests': 'Basic UI tests for component rendering and user interaction (e.g., input field, button click).'}"
+      ]
+    },
+    {
+      "name": "DevOps Agent",
+      "role": "Define environment variables, Docker workflow, and repository packaging.",
+      "outputs": [
+        "Docker-ready project",
+        "Environment sample file",
+        "GitHub repository upload"
+      ]
+    },
+    {
+      "name": "Reviewer Agent",
+      "role": "Review the generated plan for completeness, security, and portfolio quality.",
+      "outputs": [
+        "**Step 1: Document Ingestion (Offline/Setup)**: Sample compliance documents are loaded, chunked into smaller passages, and converted into numerical embeddings.",
+        "**Step 2: Vector Database Population (Offline/Setup)**: These embeddings are stored in the vector database, indexed for efficient semantic search.",
+        "**Step 3: User Query (Online)**: A Junior Compliance Officer enters a question into the frontend (e.g., 'How do I report a conflict of interest?').",
+        "**Step 4: Query Embedding (Backend)**: The backend API receives the query and converts it into a vector embedding using the same embedding model.",
+        "**Step 5: Semantic Search (Backend + Vector DB)**: The query embedding is used to search the vector database for the most semantically similar document chunks.",
+        "**Step 6: Context Retrieval (Backend)**: The top N (e.g., 3-5) most relevant document chunks are retrieved."
+      ]
+    }
+  ],
+  "model_provider": "gemini",
+  "model_name": "gemini-2.5-flash",
+  "fallback_reason": "OpenAI limit reached. Automatically switched to Gemini.",
+  "architecture": "Compliance Knowledge Portal",
+  "architecture_template_id": 7,
+  "architecture_template_path": "templates/simple-rag/compliance-knowledge-portal",
+  "architecture_description": "Compliance Knowledge Portal for policy evidence retrieval.",
+  "architecture_version": "1.0",
+  "architecture_origin": "built_in",
+  "architecture_quality_score": 70,
+  "architecture_evolution_notes": "",
+  "architecture_technology": null,
+  "architecture_source_version": null,
+  "validation_pipeline": [
+    "pytest",
+    "npm install",
+    "npm run build",
+    "docker compose config",
+    "docker compose build"
+  ],
+  "problem_statement": "Build a portfolio-ready Simple RAG application for Legal Compliance Escalation Triage Simple RAG - Beginner Custom 15 that returns explainable answers with sources and timeline evidence.",
+  "target_users": [
+    "Students",
+    "Junior developers",
+    "Portfolio reviewers",
+    "Interviewers"
+  ],
+  "functional_requirements": [
+    "Accept a user question or task from the React UI.",
+    "Validate request shape and reject empty input.",
+    "Execute the Simple RAG workflow with observable timeline steps.",
+    "Return answer, cited sources, timeline, and project metadata.",
+    "Persist each run for debugging, demos, and interview explanation."
+  ],
+  "non_functional_requirements": [
+    "Keep local deterministic fallback behavior so the repo runs without paid API keys.",
+    "Avoid logging secrets or raw provider credentials.",
+    "Keep API responses stable enough for frontend and tests.",
+    "Support Docker-based local deployment and PostgreSQL production storage.",
+    "Keep generated documentation accurate enough for portfolio review."
+  ],
+  "entities": [
+    "RunLog",
+    "SourceDocument",
+    "RetrievedChunk",
+    "TimelineStep",
+    "EmbeddingRecord",
+    "VectorCollection"
+  ],
+  "database_tables": [
+    "run_logs",
+    "source_documents",
+    "retrieved_chunks",
+    "timeline_steps"
+  ],
+  "api_endpoints": [
+    {
+      "method": "GET",
+      "path": "/api/health",
+      "purpose": "Health check for deployment and monitoring."
+    },
+    {
+      "method": "POST",
+      "path": "/api/ask",
+      "purpose": "Run the Simple RAG workflow for a user question."
+    },
+    {
+      "method": "GET",
+      "path": "/api/runs",
+      "purpose": "Return recent stored run logs for review and debugging."
+    }
+  ],
+  "workflows": [
+    "**Step 1: Document Ingestion (Offline/Setup)**: Sample compliance documents are loaded, chunked into smaller passages, and converted into numerical embeddings.",
+    "**Step 2: Vector Database Population (Offline/Setup)**: These embeddings are stored in the vector database, indexed for efficient semantic search.",
+    "**Step 3: User Query (Online)**: A Junior Compliance Officer enters a question into the frontend (e.g., 'How do I report a conflict of interest?').",
+    "**Step 4: Query Embedding (Backend)**: The backend API receives the query and converts it into a vector embedding using the same embedding model.",
+    "**Step 5: Semantic Search (Backend + Vector DB)**: The query embedding is used to search the vector database for the most semantically similar document chunks.",
+    "**Step 6: Context Retrieval (Backend)**: The top N (e.g., 3-5) most relevant document chunks are retrieved.",
+    "**Step 7: Prompt Construction (Backend)**: These retrieved chunks are combined with the original user query and a system instruction into a concise prompt for the LLM.",
+    "**Step 8: LLM Generation (Backend)**: The prompt is sent to the LLM, which generates a coherent and relevant answer based *only* on the provided context."
+  ],
+  "architecture_components": [
+    "React frontend",
+    "FastAPI backend",
+    "Pipeline service",
+    "Vector/search service",
+    "SQL database",
+    "Optional LLM provider"
+  ],
+  "sequence_flows": [
+    "Main ask flow",
+    "RAG retrieval flow",
+    "Agent execution flow",
+    "Provider fallback flow"
+  ],
+  "security_controls": [
+    "Input validation",
+    "CORS allowlist",
+    "Secret-only environment variables",
+    "Safe logging",
+    "Rate limiting recommendation"
+  ],
+  "scalability_plan": [
+    "Move long runs to a queue",
+    "Use PostgreSQL in production",
+    "Use managed vector DB when data grows",
+    "Cache repeated retrievals",
+    "Add metrics and traces"
+  ],
+  "interview_topics": [
+    "Problem statement",
+    "Architecture layers",
+    "DFD levels",
+    "Database schema",
+    "API contract",
+    "Security",
+    "Scaling"
+  ],
+  "documentation_quality_pipeline": [
+    "enrich_blueprint",
+    "write_design_docs",
+    "validate_required_docs",
+    "qa_score_before_push"
+  ]
+}
